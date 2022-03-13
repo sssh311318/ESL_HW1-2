@@ -121,60 +121,94 @@ int Testbench::write_bmp(string outfile_name) {
 }
 
 void Testbench::do_gaussian() {
-  int x, y, v, u;        // for loop counter
-  unsigned char R, G, B, Grey; // color of R, G, B
-  int adjustX, adjustY, xBound, yBound;
-  int total;
+  int x, y;        // for loop counter
+  unsigned char R, G, B; // color of R, G, B
+  //int adjustX, adjustY, xBound, yBound;
+  double total_grey;
+  //int total_r , total_g , total_b;
 
   o_rst.write(false);
   o_rst.write(true);
-  for (y = 0; y != height; ++y) {
-    for (x = 0; x != width; ++x) {
+  for (y = -1; y <= 256; ++y) {
+    for (x = -1; x <= 256; ++x) {
+      /*
       adjustX = (MASK_X % 2) ? 1 : 0; // 1
       adjustY = (MASK_Y % 2) ? 1 : 0; // 1
       xBound = MASK_X / 2;            // 1
       yBound = MASK_Y / 2;            // 1
-
-      for (v = -yBound; v != yBound + adjustY; ++v) {   //-1, 0, 1
-        for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
-          if (x + u >= 0 && x + u < width && y + v >= 0 && y + v < height) {
+      */
+      //for (v = -yBound; v != yBound + adjustY; ++v) {   //-1, 0, 1
+        //for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
+          if (x  >= 0 && x  < width && y  >= 0 && y  < height) {
             R = *(source_bitmap +
-                  bytes_per_pixel * (width * (y + v) + (x + u)) + 2);
+                  bytes_per_pixel * (width * (y ) + (x )) + 2);
             G = *(source_bitmap +
-                  bytes_per_pixel * (width * (y + v) + (x + u)) + 1);
+                  bytes_per_pixel * (width * (y ) + (x )) + 1);
             B = *(source_bitmap +
-                  bytes_per_pixel * (width * (y + v) + (x + u)) + 0);
+                  bytes_per_pixel * (width * (y ) + (x )) + 0);
           } else {
             R = 0;
             G = 0;
             B = 0;
           }
-          Grey = ( R + G + B ) / 3;
-          o_grey.write(Grey);
           
-          //o_r.write(R);
-          //o_g.write(G);
-          //o_b.write(B);
+          o_r.write(R);
+          o_g.write(G);
+          o_b.write(B);
+          //printf("send data\n");
           wait(1); //emulate channel delay
-        }
-      }
+        //}
+      //}
+      /*
+      if(i_result_grey.num_available()==0) wait(i_result_grey.data_written_event());
+      total_grey = i_result_grey.read();
+      */
 
-      if(i_result.num_available()==0) wait(i_result.data_written_event());
-      total = i_result.read();
+      /*
+      if(i_result_r.num_available()==0) wait(i_result_r.data_written_event());
+      if(i_result_g.num_available()==0) wait(i_result_g.data_written_event());
+      if(i_result_b.num_available()==0) wait(i_result_b.data_written_event());
+      total_r = i_result_r.read();
+      total_g = i_result_g.read();
+      total_b = i_result_b.read();
+      */
       //cout << "Now at " << sc_time_stamp() << endl; //print current sc_time
-
-      if (total - THRESHOLD >= 0) {
-        // black
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = total;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = total;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = total;
-      } else {
-        // white
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = total;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = total;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = total;
+       //total_grey = i_result_grey.read();
+     
+      /*
+      if(total_g  >= 0 ){
+        *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = total_g;
       }
-    }
+      else{
+        *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = 0;
+      }
+      if(total_b  >= 0 ){
+        *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = total_b;
+      }
+      else{
+        *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = 0;
+      }
+      */
+     
+      }
+      for (unsigned int i = 0 ; i <=255 ; i++){
+        
+        if(i_result_grey.num_available()==0) wait(i_result_grey.data_written_event());
+          total_grey = i_result_grey.read();
+          printf("total_grey %f \n",total_grey);
+        
+      
+
+        *(target_bitmap + bytes_per_pixel * (width * (y+1) + i) + 2) = total_grey;
+        *(target_bitmap + bytes_per_pixel * (width * (y+1) + i) + 1) = total_grey;
+        *(target_bitmap + bytes_per_pixel * (width * (y+1) + i) + 0) = total_grey;
+      
+      
+      
+      }
+    //for (unsigned int i = 0 ; i <=255 ; i++){
+    
+    //}
   }
   sc_stop();
 }

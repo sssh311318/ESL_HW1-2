@@ -29,28 +29,50 @@ int sc_main(int argc, char **argv) {
   sc_signal<bool> rst("rst");
 
   //Create FIFO channels
-  //sc_fifo<unsigned char> r;
-  //sc_fifo<unsigned char> g;
-  //sc_fifo<unsigned char> b;
-  sc_fifo<unsigned char> grey;
-  sc_fifo<int> result;
-
+  sc_fifo<unsigned char> r;
+  sc_fifo<unsigned char> g;
+  sc_fifo<unsigned char> b;
+  sc_fifo<double> result_grey;
+  /*
+  sc_fifo<unsigned char> count_x;
+  sc_fifo<unsigned char> count_y;
+  */
+  /*
+  sc_fifo<int> result_r;
+  sc_fifo<int> result_g;
+  sc_fifo<int> result_b;
+  */
   //Connect FIFO channels with modules
   tb.i_clk(clk);
   tb.o_rst(rst);
   gaussian_filter.i_clk(clk);
   gaussian_filter.i_rst(rst);
-  //tb.o_r(r);
-  //tb.o_g(g);
-  //tb.o_b(b);
-  tb.o_grey(grey);
-  tb.i_result(result);
-  //gaussian_filter.i_r(r);
-  //gaussian_filter.i_g(g);
-  //gaussian_filter.i_b(b);
-  gaussian_filter.i_grey(grey);
-  gaussian_filter.o_result(result);
-
+  tb.o_r(r);
+  tb.o_g(g);
+  tb.o_b(b);
+  /*
+  tb.o_count_x(count_x);
+  tb.o_count_y(count_y);
+  */
+  /*
+  tb.i_result_r(result_r);
+  tb.i_result_g(result_g);
+  tb.i_result_b(result_b);
+  */
+  tb.i_result_grey(result_grey);
+  /*
+  gaussian_filter.i_count_x(count_x);
+  gaussian_filter.i_count_y(count_y);
+  */
+  gaussian_filter.i_r(r);
+  gaussian_filter.i_g(g);
+  gaussian_filter.i_b(b);
+  gaussian_filter.o_result_grey(result_grey);
+  /*
+  gaussian_filter.o_result_r(result_r);
+  gaussian_filter.o_result_g(result_g);
+  gaussian_filter.o_result_b(result_b);
+  */
   tb.read_bmp(argv[1]);
   sc_start();
   std::cout << "Simulated time == " << sc_core::sc_time_stamp() << std::endl;
